@@ -104,7 +104,7 @@ app.post(/\//, function (req, res) {
 ////////////////////////////////////////////////////////////////////////////
 //#updateLoginInfo
     if(req.path == "/api/updateLoginInfo") {
-        console.log('update');
+        console.log('updateInfo');
         console.log(req.body);
         if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
             res.status(401).send('ERROR');
@@ -154,7 +154,33 @@ app.post(/\//, function (req, res) {
                 }
             }
         });   
-    }     
+    }
+////////////////////////////////////////////////////////////////////////////
+//#updatePassword
+    if(req.path == "/api/updatePassword") {
+        console.log(req.body);
+        var data=req.body.userInfo;
+        connection.query('SELECT * FROM user where username=? and password=?',
+        [data.username, data.old_pass],
+        function(err, rows, fields) {
+            if(rows.length == 0) {
+                console.log("error password");
+                res.send('error');
+                return;
+            } else {
+                connection.query('UPDATE user set password=? where username=?',
+                [data.new_pass, data.username],
+                function(err, rows, fields) {
+                    if(err) {
+                        console.log(err);
+                        res.send('error');
+                    } else {
+                        res.status(200).send('ok');
+                    }                 
+                });
+            }
+        });        
+    }
 })
 
 var server = app.listen(8000, function () {
