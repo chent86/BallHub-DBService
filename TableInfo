@@ -1,0 +1,51 @@
+####
+user table
+free_time1: Mon, Tue, Wed ...
+free_time2: Morning, Afternoon, Evening
+####
+create table user(uid int not null auto_increment,
+                  username char(20) not null,
+                  password char(20) not null,
+                  name char(10),
+                  birthday date,
+                  free_time1 char(5),
+                  free_time2 char(10),
+                  constraint UserId primary key(uid));
+####
+ISA relation table
+####
+create table ISA(uid int not null,
+                  role char(10) not null,
+                  foreign key(uid) references user(uid)
+                  on delete cascade 
+                  on update cascade);
+####
+player table
+####
+create table player(uid int not null,
+                    sex char(10),
+                    primary key(uid),
+                    foreign key(uid) references user(uid)
+                    on delete cascade 
+                    on update cascade);
+
+####
+referee table
+####
+create table referee(uid int not null,
+                    sex char(10),
+                    price int(10),
+                    primary key(uid),
+                    foreign key(uid) references user(uid)
+                    on delete cascade 
+                    on update cascade);
+
+####
+team table
+####
+create table team(uid int not null,
+                    motto char(30),
+                    primary key(uid),
+                    foreign key(uid) references user(uid)
+                    on delete cascade 
+                    on update cascade);
