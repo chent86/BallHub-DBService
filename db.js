@@ -83,94 +83,112 @@ app.post(/\//, function (req, res) {
     [req.body.username],
     function(err, rows, fields) {
       if(rows.length == 0) {
-          connection.query('INSERT into user (username, password) values (?,?)',
-          [req.body.username, req.body.password],
-          function(err, rows, fields) {
-            //获取自动生成的pid(自增的一个整数)
-            connection.query('SELECT uid from user where username=?',
-            [req.body.username],
+        connection.query('INSERT into user (username, password) values (?,?)',
+        [req.body.username, req.body.password],
+        function(err, rows, fields) {
+          //获取自动生成的pid(自增的一个整数)
+          connection.query('SELECT uid from user where username=?',
+          [req.body.username],
+          function(err,rows,fields) {
+            var id = rows[0].uid
+            //将用户id加入ISA关系表
+            connection.query('INSERT into ISA(uid,role) values (?,?)',
+            [id, req.body.role],
             function(err,rows,fields) {
-              var id = rows[0].uid
-              //将用户id加入ISA关系表
-              connection.query('INSERT into ISA(uid,role) values (?,?)',
-              [id, req.body.role],
+              //将用户id加入具体角色信息表
+              connection.query('INSERT into ?? (uid) values (?)',
+              [req.body.role, id],
               function(err,rows,fields) {
-                //将用户id加入具体角色信息表
-                connection.query('INSERT into ?? (uid) values (?)',
-                [req.body.role, id],
-                function(err,rows,fields) {
-                  res.status(200).send('OK'); 
-                });  
-              });            
-            });
+                res.status(200).send('OK'); 
+              });  
+            });            
           });
+        });
       } else {
-          console.log("username has been used!");
-          res.send('USERNAME HAS BEEN USED');
-          return;
+        console.log("username has been used!");
+        res.send('USERNAME HAS BEEN USED');
+        return;
       }
     });
   }
 ////////////////////////////////////////////////////////////////////////////
 //#updateLoginInfo
-    if(req.path == "/api/updateLoginInfo") {
-        console.log('updateInfo');
-        console.log(req.body);
-        if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
-            res.status(401).send('ERROR');
-            return; 
-        }
-        var data = JSON.parse(req.body.cookies);
-        connection.query('SELECT * FROM user where username="'+data.username+'" and password="'+data.password+'"', function(err, rows, fields) {
-            if(rows.length == 0) {
-                console.log("error");
-                res.status(401).send('ERROR');
-                return;                     
-            } else {
-                var role = rows[0].role;
-                var info = req.body.userInfo;
-                if(role == 'player') {
-                    connection.query('UPDATE player set age=?,sex=?,free_time=? where username=?',
-                    [info.age, info.sex, info.free_time, data.username],
-                    function(err) {
-                        if(err) {
-                            res.status(401).send('Update Error!'); 
-                        } else {
-                            res.status(200).send('ok');    
-                        }                
-                    });                    
-                } else if(role == 'referee') {
-                    connection.query('UPDATE referee set age=?,sex=?,free_time=?,price=? where username=?',
-                    [info.age, info.sex, info.free_time,info.price, data.username],
-                    function(err) {
-                        if(err) {
-                            console.log(err);
-                            res.status(401).send('Update Error!');
-                        } else {
-                            res.status(200).send('ok');  
-                        }                  
-                    });  
-                } else if(role == 'team') {
-                    connection.query('UPDATE team set free_time=?,team_name=? where username=?',
-                    [info.free_time,info.team_name, data.username],
-                    function(err) {
-                        if(err) {
-                            console.log(err);
-                            res.status(401).send('Update Error!'); 
-                        } else {
-                            res.status(200).send('ok'); 
-                        }                   
-                    });                     
-                }
-            }
-        });   
+  if(req.path == "/api/updateLoginInfo") {
+    console.log('updateInfo');
+    console.log(req.body);
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+        res.status(401).send('ERROR');
+        return; 
     }
+    var data = JSON.parse(req.body.cookies);
+    connection.query('SELECT * FROM user where username=? and password=?',
+    [data.username, data.password],
+    function(err, rows, fields) {
+      if(rows.length == 0) {
+        console.log("error");
+        res.status(401).send('ERROR');
+        return;                     
+      } else {
+        var id = rows[0].uid;
+        console.log(id);
+        var info = req.body.userInfo;
+        console.log(info);
+        connection.query('UPDATE user set name=?,birthday=?,free_time_1=?,free_time_2=? where uid=?',
+        [info.name, info.birthday, info.free_time_1, info.free_time_2, id],
+        function(err) {
+          if(err) {
+            console.log(err);
+            res.status(401).send('Update Error!');
+            return; 
+          }
+          connection.query('SELECT role from ISA where uid=?',
+          [id],
+          function(err, rows, fields) {
+            var role = rows[0].role;
+            if(role == 'player') {
+              connection.query('UPDATE player set sex=? where uid=?',
+              [info.sex, id],
+              function(err) {
+                  if(err) {
+                      res.status(401).send('Update Error!'); 
+                  } else {
+                      res.status(200).send('ok');    
+                  }                
+              });                    
+            } else if(role == 'referee') {
+                connection.query('UPDATE referee set sex=?,price=? where uid=?',
+                [info.sex, info.price, id],
+                function(err) {
+                    if(err) {
+                        console.log(err);
+                        res.status(401).send('Update Error!');
+                    } else {
+                        res.status(200).send('ok');  
+                    }                  
+                });  
+            } else if(role == 'team') {
+                connection.query('UPDATE team set motto=? where uid=?',
+                [info.motto, id],
+                function(err) {
+                    if(err) {
+                        console.log(err);
+                        res.status(401).send('Update Error!'); 
+                    } else {
+                        res.status(200).send('ok'); 
+                    }                   
+                });                     
+            }
+          });            
+        });           
+      }
+    });   
+  }
 ////////////////////////////////////////////////////////////////////////////
 //#updatePassword
     if(req.path == "/api/updatePassword") {
         console.log(req.body);
         var data=req.body.userInfo;
-        connection.query('SELECT * FROM user where username=? and password=?',
+        connection.query('SELECT uid FROM user where username=? and password=?',
         [data.username, data.old_pass],
         function(err, rows, fields) {
             if(rows.length == 0) {
@@ -178,8 +196,8 @@ app.post(/\//, function (req, res) {
                 res.send('error');
                 return;
             } else {
-                connection.query('UPDATE user set password=? where username=?',
-                [data.new_pass, data.username],
+                connection.query('UPDATE user set password=? where uid=?',
+                [data.new_pass, rows[0].uid],
                 function(err, rows, fields) {
                     if(err) {
                         console.log(err);
