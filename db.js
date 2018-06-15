@@ -86,27 +86,29 @@ app.post(/\//, function (req, res) {
         connection.query('INSERT into user (username, password) values (?,?)',
         [req.body.username, req.body.password],
         function(err, rows, fields) {
-          //获取自动生成的pid(自增的一个整数)
-          connection.query('SELECT uid from user where username=?',
-          [req.body.username],
-          function(err,rows,fields) {
-            var id = rows[0].uid
+          // //获取自动生成的pid(自增的一个整数)    => fix: 可以通过LAST_INSERT_ID()获得当前connection的最新的id(不会有出错的风险且没有上锁的必要)
+          // connection.query('SELECT uid from user where username=?',
+          // [req.body.username],
+          // function(err,rows,fields) {
+          //   var id = rows[0].uid
             //将用户id加入ISA关系表
-            connection.query('INSERT into ISA(uid,role) values (?,?)',
-            [id, req.body.role],
+            connection.query('INSERT into ISA(uid,role) values (LAST_INSERT_ID(),?)',
+            [req.body.role],
             function(err,rows,fields) {
               //将用户id加入具体角色信息表
-              connection.query('INSERT into ?? (uid) values (?)',
-              [req.body.role, id],
+              connection.query('INSERT into ?? (uid) values (LAST_INSERT_ID())',
+              [req.body.role],
               function(err,rows,fields) {
-                res.status(200).send('OK'); 
+                if(err)
+                  res.send('error');
+                res.status(200).send('ok'); 
               });  
             });            
-          });
+          // });
         });
       } else {
         console.log("username has been used!");
-        res.send('USERNAME HAS BEEN USED');
+        res.send('error');
         return;
       }
     });
@@ -227,6 +229,92 @@ app.post(/\//, function (req, res) {
       else
         res.status(200).send('ok');
     });     
+  }
+////////////////////////////////////////////////////////////////////////////
+//#getMyGame
+  if(req.path == "/api/getMyGame") {
+    console.log(req.body);
+    var organize1 = {
+      'start_time': '2018-06-15 16:39:00',
+      'end_time': '2018-06-16 16:39:00',
+      'type': '半场',
+      'max_number': 10,
+      'current_number': 5,
+      'tag': '组织者'
+    };
+    var organize2 = {
+      'start_time': '2018-06-16 16:39:00',
+      'end_time': '2018-06-16 16:39:00',
+      'type': '半场',
+      'max_number': 10,
+      'current_number': 5,
+      'tag': '组织者'
+    };
+    var attend1 = {
+      'start_time': '2018-06-17 16:39:00',
+      'end_time': '2018-06-16 16:39:00',
+      'type': '全场',
+      'max_number': 10,
+      'current_number': 5,
+      'tag': '参与者'
+    };
+    var attend2 = {
+      'start_time': '2018-06-18 16:39:00',
+      'end_time': '2018-06-16 16:39:00',
+      'type': '全场',
+      'max_number': 10,
+      'current_number': 5,
+      'tag': '参与者'
+    };
+    var package = [organize1, attend1, organize2, attend2];
+    console.log(package);
+    res.send(package);  
+    // connection.query('select * from user',
+    // function(err, rows, fields) {
+    //   console.log(rows);
+    //   console.log(rows[0]);
+    //   res.send(rows);
+    // });       
+  }
+////////////////////////////////////////////////////////////////////////////
+//#organizeGame
+  if(req.path == "/api/organizeGame") {
+    console.log(req.data);
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      var data = JSON.parse(req.body.cookies);
+      var info = req.body.gameInfo;
+    }
+    connection.query('SELECT * FROM user where username=? and password=?',
+    [data.username, data.password],
+    function(err, rows, fields) {
+      if(err) {
+        res.send('error');
+        return;
+      } else {
+        var id = rows[0].uid;
+        connection.query('INSERT into game(start_time, end_time, type, number)values(?,?,?,?)',
+        [info.start_time, info.end_time, info.type, info.number],
+        function(err, rows, fields) {
+          if(err) {
+            res.send('error');
+            return;
+          } else {
+            connection.query('INSERT into organize(uid,gid)values(?,LAST_INSERT_ID())',
+            [id],
+            function(err, rows, fields) {
+              if(err) {
+                res.send('error');
+              } else {
+                res.send('ok');
+              }
+            });            
+          }
+        });       
+      }
+    });
   }
 })
 

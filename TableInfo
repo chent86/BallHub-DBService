@@ -49,3 +49,37 @@ create table team(uid int not null,
                     foreign key(uid) references user(uid)
                     on delete cascade 
                     on update cascade)CHARSET=utf8;
+
+####
+game table
+####
+create table game(gid int not null auto_increment,
+                    primary key(gid),
+                    start_time char(20),
+                    end_time char(20),
+                    type char(10),
+                    number int)CHARSET=utf8;
+
+####
+organize relation table
+####
+create table organize(uid int not null,
+                  gid int not null,
+                  foreign key(uid) references user(uid)
+                  on delete cascade 
+                  on update cascade,
+                  foreign key(gid) references game(gid)
+                  on delete cascade 
+                  on update cascade);
+
+####
+attend relation table
+####
+create table attend(uid int not null,
+                  gid int not null,
+                  foreign key(uid) references user(uid)
+                  on delete cascade 
+                  on update cascade,
+                  foreign key(gid) references game(gid)
+                  on delete cascade 
+                  on update cascade);
