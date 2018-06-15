@@ -138,7 +138,7 @@ app.post(/\//, function (req, res) {
         function(err) {
           if(err) {
             console.log(err);
-            res.status(401).send('Update Error!');
+            res.send('error');
             return; 
           }
           connection.query('SELECT role from ISA where uid=?',
@@ -150,7 +150,7 @@ app.post(/\//, function (req, res) {
               [info.sex, id],
               function(err) {
                   if(err) {
-                      res.status(401).send('Update Error!'); 
+                      res.send('error'); 
                   } else {
                       res.status(200).send('ok');    
                   }                
@@ -161,7 +161,7 @@ app.post(/\//, function (req, res) {
                 function(err) {
                     if(err) {
                         console.log(err);
-                        res.status(401).send('Update Error!');
+                        res.send('error');
                     } else {
                         res.status(200).send('ok');  
                     }                  
@@ -172,7 +172,7 @@ app.post(/\//, function (req, res) {
                 function(err) {
                     if(err) {
                         console.log(err);
-                        res.status(401).send('Update Error!'); 
+                        res.send('error'); 
                     } else {
                         res.status(200).send('ok'); 
                     }                   
@@ -209,6 +209,25 @@ app.post(/\//, function (req, res) {
             }
         });        
     }
+////////////////////////////////////////////////////////////////////////////
+//#updatePassword
+  if(req.path == "/api/deleteUser") {
+    console.log(req.body);
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      data = JSON.parse(req.body.cookies);
+    }
+    connection.query('Delete FROM user where username=? and password=?',
+    [data.username, data.password],
+    function(err, rows, fields) {
+      if(err)
+        res.send('error');
+      else
+        res.status(200).send('ok');
+    });     
+  }
 })
 
 var server = app.listen(8000, function () {
