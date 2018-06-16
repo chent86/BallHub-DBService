@@ -214,7 +214,6 @@ app.post(/\//, function (req, res) {
 ////////////////////////////////////////////////////////////////////////////
 //#updatePassword
   if(req.path == "/api/deleteUser") {
-    console.log(req.body);
     if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
       res.status(401).send('ERROR');
       return; 
@@ -233,53 +232,61 @@ app.post(/\//, function (req, res) {
 ////////////////////////////////////////////////////////////////////////////
 //#getMyGame
   if(req.path == "/api/getMyGame") {
-    console.log(req.body);
-    var organize1 = {
-      'start_time': '2018-06-15 16:39:00',
-      'end_time': '2018-06-16 16:39:00',
-      'type': '半场',
-      'max_number': 10,
-      'current_number': 5,
-      'tag': '组织者'
-    };
-    var organize2 = {
-      'start_time': '2018-06-16 16:39:00',
-      'end_time': '2018-06-16 16:39:00',
-      'type': '半场',
-      'max_number': 10,
-      'current_number': 5,
-      'tag': '组织者'
-    };
-    var attend1 = {
-      'start_time': '2018-06-17 16:39:00',
-      'end_time': '2018-06-16 16:39:00',
-      'type': '全场',
-      'max_number': 10,
-      'current_number': 5,
-      'tag': '参与者'
-    };
-    var attend2 = {
-      'start_time': '2018-06-18 16:39:00',
-      'end_time': '2018-06-16 16:39:00',
-      'type': '全场',
-      'max_number': 10,
-      'current_number': 5,
-      'tag': '参与者'
-    };
-    var package = [organize1, attend1, organize2, attend2];
-    console.log(package);
-    res.send(package);  
-    // connection.query('select * from user',
-    // function(err, rows, fields) {
-    //   console.log(rows);
-    //   console.log(rows[0]);
-    //   res.send(rows);
-    // });       
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      data = JSON.parse(req.body.cookies);
+      connection.query('SELECT * FROM user where username=? and password=?',
+      [data.username, data.password],
+      function(err, rows, fields) {
+        if(err) {
+          res.status(401).send('ERROR');
+          return; 
+        } else {
+          connection.query('select * from (select gid,count(uid) from attend group by attend.gid)a,(select * from game)b,(select gid,role from attend where uid=?)c where a.gid=b.gid and b.gid=c.gid',
+          [rows[0].uid],                  //a: 获得每个球局的参与人数   b:获得球局信息   c:获得指定id的球员的角色
+          function(err, rows, fields) {
+            res.send(rows);
+          }); 
+        }    
+      });
+    }      
+  }
+
+////////////////////////////////////////////////////////////////////////////
+//#getAllGame
+  if(req.path == "/api/getAllGame") {
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      data = JSON.parse(req.body.cookies);
+      connection.query('SELECT * FROM user where username=? and password=?',
+      [data.username, data.password],
+      function(err, rows, fields) {
+        if(err) {
+          res.status(401).send('ERROR');
+          return; 
+        } else {
+          connection.query('select * from (select gid,count(uid) from attend group by attend.gid)a,(select * from game)b where a.gid=b.gid',
+          function(err, rows, fields) {
+            res.send(rows);
+          }); 
+        }    
+      });
+    }    
+    // res.send([{
+    //   'start_time': '2018-06-18 16:39:00',
+    //   'end_time': '2018-06-16 16:39:00',
+    //   'type': '全场',
+    //   'number': 10,
+    //   'current_number': 5
+    // }]);
   }
 ////////////////////////////////////////////////////////////////////////////
 //#organizeGame
   if(req.path == "/api/organizeGame") {
-    console.log(req.data);
     if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
       res.status(401).send('ERROR');
       return; 
@@ -291,7 +298,7 @@ app.post(/\//, function (req, res) {
     [data.username, data.password],
     function(err, rows, fields) {
       if(err) {
-        res.send('error');
+        res.status(401).send('ERROR');
         return;
       } else {
         var id = rows[0].uid;
@@ -302,7 +309,7 @@ app.post(/\//, function (req, res) {
             res.send('error');
             return;
           } else {
-            connection.query('INSERT into organize(uid,gid)values(?,LAST_INSERT_ID())',
+            connection.query('INSERT into attend(uid,gid,role)values(?,LAST_INSERT_ID(),"组织者")',
             [id],
             function(err, rows, fields) {
               if(err) {
@@ -315,6 +322,87 @@ app.post(/\//, function (req, res) {
         });       
       }
     });
+  }
+////////////////////////////////////////////////////////////////////////////
+//#joinGame
+  if(req.path == "/api/joinGame") {
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      var data = JSON.parse(req.body.cookies);
+      var id = req.body.gameInfo.gid;
+      connection.query('SELECT * FROM user where username=? and password=?',
+      [data.username, data.password],
+      function(err, rows, fields) {
+        if(err) {
+          res.status(401).send('ERROR');
+          return;
+        } else {
+          connection.query('INSERT into attend(uid,gid,role) values(?,?,"参与者")',
+          [rows[0].uid, id],
+          function(err, rows, fields) {
+            if(err) {
+              res.send('error');
+            } else {
+              res.send('ok');
+            }
+          });          
+        }
+      });
+    }    
+  }
+////////////////////////////////////////////////////////////////////////////
+//#quitGame
+  if(req.path == "/api/quitGame") {
+    if(JSON.stringify(req.body) == '{}' || req.body.cookies == '') {
+      res.status(401).send('ERROR');
+      return; 
+    } else {
+      var data = JSON.parse(req.body.cookies);
+      var gid = req.body.gameInfo.gid;
+      connection.query('SELECT * FROM user where username=? and password=?',
+      [data.username, data.password],
+      function(err, rows, fields) {
+        if(err) {
+          res.status(401).send('ERROR');
+          return;
+        } else {
+          var uid = rows[0].uid;
+          connection.query('SELECT role from attend where uid=? and gid=?',
+          [uid, gid],
+          function(err, rows, fields) {
+            if(err) {
+              res.send('error');
+            } else {
+              if(rows[0].role == '组织者') {
+                connection.query('DELETE from game where gid=?',
+                [gid],
+                function(err, rows, fields) {
+                  if(err) {
+                    res.send('error');
+                  } else {
+                    res.send('ok');
+                  }
+                });                
+              } else if(rows[0].role == '参与者') {
+                  connection.query('DELETE from attend where uid=? and gid=?',
+                  [uid, gid],
+                  function(err, rows, fields) {
+                    if(err) {
+                      res.send('error');
+                    } else {
+                      res.send('ok');
+                    }
+                  });                   
+              } else {
+                res.send('error');
+              }
+            }
+          });          
+        }
+      });
+    }    
   }
 })
 
