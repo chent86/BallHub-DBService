@@ -1,16 +1,16 @@
 {
-  "name": "database",
-  "version": "1.0.0",
-  "description": "database for BallHub",
-  "main": "index.js",
+  "name": "test",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
     "mysql": "^2.15.0"
   }
 }

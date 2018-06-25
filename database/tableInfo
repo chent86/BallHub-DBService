@@ -1,0 +1,94 @@
+####
+user table
+free_time1: Mon, Tue, Wed ...
+free_time2: Morning, Afternoon, Evening
+####
+create table user(uid int not null auto_increment,
+                  username char(20) not null,
+                  password char(20) not null,
+                  name char(10),
+                  birthday char(10),
+                  free_time_1 char(5),
+                  free_time_2 char(10),
+                  primary key(uid),
+                  unique key(username))CHARSET=utf8;
+####
+ISA relation table
+rid 意为 role id
+ISA的外码为user的主键，player，referee，team的外码为ISA的主键，当user删除则ISA和泛化的表都级联删除
+不让ISA有两个外码的原因：1.删除不方便 2.ISA外码选择有三个表，不好操作（或者说不能同时绑定三个外部表）
+####
+create table ISA(uid int not null,
+                 rid int not null auto_increment,
+                 primary key(rid),
+                 role char(10) not null,
+                 foreign key(uid) references user(uid)
+                 on delete cascade 
+                 on update cascade);
+####
+player table
+####
+create table player(rid int not null,
+                    sex char(10),
+                    primary key(rid),
+                    foreign key(rid) references ISA(rid)
+                    on delete cascade 
+                    on update cascade);
+
+####
+referee table
+####
+create table referee(rid int not null,
+                    sex char(10),
+                    price int(10),
+                    primary key(rid),
+                    foreign key(rid) references ISA(rid)
+                    on delete cascade 
+                    on update cascade);
+
+####
+team table
+####
+create table team(rid int not null,
+                    motto char(30),
+                    primary key(rid),
+                    foreign key(rid) references ISA(rid)
+                    on delete cascade 
+                    on update cascade)CHARSET=utf8;
+
+####
+game table
+####
+create table game(gid int not null auto_increment,
+                    primary key(gid),
+                    start_time char(20),
+                    end_time char(20),
+                    type char(10),
+                    number int)CHARSET=utf8;
+####
+attend relation table
+####
+create table attend(uid int not null,
+                  gid int not null,
+                  role char(10) not null,
+                  primary key(uid,gid),
+                  foreign key(uid) references user(uid)
+                  on delete cascade 
+                  on update cascade,
+                  foreign key(gid) references game(gid)
+                  on delete cascade 
+                  on update cascade)CHARSET=utf8;
+
+## type  水泥地，塑胶地， 室内木板
+create table court(cid int not null auto_increment,
+                      location char(100),
+                      type char(10),
+                      price int(10),
+                      primary key(cid))CHARSET=utf8;
+
+create table locate(uid int not null,\
+                      role char(10) not null,\
+                      foreign key(uid) references user(uid)\
+                      on delete cascade \
+                      on update cascade);
+                      
