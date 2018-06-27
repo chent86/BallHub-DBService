@@ -5,8 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 // var indexRouter = require('./routes/index');
+var addCourt = require('./routes/addCourt');
 var deleteUser = require('./routes/deleteUser');
+var getAllCourt = require('./routes/getAllCourt');
 var getAllGame = require('./routes/getAllGame');
+var getLoginInfo = require('./routes/getLoginInfo');
+var getMyCourt = require('./routes/getMyCourt');
 var getMyGame = require('./routes/getMyGame');
 var joinGame = require('./routes/joinGame');
 var login = require('./routes/login');
@@ -26,18 +30,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // app.use('/', indexRouter);
+app.use('/api/addCourt',addCourt);
 app.use('/api/deleteUser',deleteUser);
+app.use('/api/getAllCourt', getAllCourt);
 app.use('/api/getAllGame', getAllGame);
+app.use('/api/getUserInfo', getLoginInfo);
 app.use('/api/getMyGame',getMyGame);
 app.use('/api/joinGame',joinGame);
 app.use('/api/login', login);
-app.use('/api/getUserInfo', login);
 app.use('/api/logout', logout);
 app.use('/api/organizeGame',organizeGame);
 app.use('/api/quitGame',quitGame);
 app.use('/api/register', register);
 app.use('/api/updateLoginInfo', updateLoginInfo);
 app.use('/api/updatePassword',updatePassword);
+app.use('/api/getMyCourt', getMyCourt);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

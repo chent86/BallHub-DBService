@@ -4,8 +4,8 @@ var handler = require('../handler')
 var connection = handler.connection();
 
 router.post('/', (req, res, next) => {
-  var data = handler.check(req);
-  if(data === 'error') {
+  var data = req.body;
+  if(JSON.stringify(data) == '{}') {
     res.status(401).send('ERROR');
   } else {
     connection.query('INSERT into user (username, password) values (?,?)', //添加信息到user

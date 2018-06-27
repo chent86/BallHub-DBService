@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var cookie = require('cookie');
 var handler = {
   connection : () => {
     return mysql.createConnection({
@@ -11,17 +12,14 @@ var handler = {
     });
   },
   check : (req) => {  // 返回用户名与密码(cookies优先)
-    console.log(req.body);
-    if(JSON.stringify(req.body) == '{}') {
+    var cookies = cookie.parse(req.headers.cookie || '');
+    if(cookies.BallHub === undefined) {
       return 'error';
-    }
-    if(req.body.cookies === undefined) {
-      data = req.body;
     } else {
-      data = JSON.parse(req.body.cookies);
+      data = JSON.parse(cookies.BallHub);
     }
     if(JSON.stringify(data) == '{}') {
-      return 'error'
+      return 'error';
     }
     return data;
   },
@@ -36,7 +34,7 @@ var handler = {
     });
     connection.query('SELECT * FROM user where username=? and password=?',
     [data.username, data.password], (err, rows, fields) => {
-      if(rows.length == 0) {
+      if(err || rows.length == 0) {
         callback('error');
       } else {
         var id = rows[0].uid;

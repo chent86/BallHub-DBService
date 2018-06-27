@@ -79,16 +79,29 @@ create table attend(uid int not null,
                   on delete cascade 
                   on update cascade)CHARSET=utf8;
 
-## type  水泥地，塑胶地， 室内木板
+###
+court table
+type  水泥地，塑胶地， 室内木板
+creater　添加改场地信息的人
+link 引用次数
+###
 create table court(cid int not null auto_increment,
+                      creator int not null,
                       location char(100),
                       type char(10),
                       price int(10),
+                      link int(200),
                       primary key(cid))CHARSET=utf8;
-
-create table locate(uid int not null,\
-                      role char(10) not null,\
-                      foreign key(uid) references user(uid)\
-                      on delete cascade \
+####
+loacte relation table
+####
+create table locate(gid int not null,
+                      cid int not null,
+                      primary key(gid,cid),
+                      foreign key(gid) references game(gid)
+                      on delete cascade
+                      on update cascade,
+                      foreign key(cid) references court(cid)
+                      on delete cascade
                       on update cascade);
                       
