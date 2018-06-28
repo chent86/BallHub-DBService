@@ -45,6 +45,7 @@ var handler = {
           connection.query('SELECT * from user,ISA,?? where user.uid=? and ISA.uid=? and ??.rid=?',
           [rows[0].role, id, id, rows[0].role, rows[0].rid], (err, rows, fields) => {
             callback(rows[0]);
+            connection.end();
           });                    
         });
       }

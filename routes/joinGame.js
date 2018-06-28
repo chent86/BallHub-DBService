@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('../handler')
-var connection = handler.connection();
 
 router.post('/', (req, res, next) => {
   var data = handler.check(req);
@@ -11,13 +10,12 @@ router.post('/', (req, res, next) => {
     var info = req.body.gameInfo;
     handler.getUserInfo(data, (userInfo) => {  
       if( userInfo !== 'error') {
+        var connection = handler.connection();
         connection.query('INSERT into attend(uid,gid,role) values(?,?,"参与者")',
         [userInfo.uid, info.gid], (err, rows, fields) => {
-          if(err) {
-            res.send('error');
-          } else {
-            res.send('ok');
-          }
+          if(err) { res.send('error');} 
+          else { res.send('ok');}
+          connection.end();
         });         
       } else {
         res.send('error');

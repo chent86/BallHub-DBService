@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('../handler')
-var connection = handler.connection();
 
 router.post('/', (req, res, next) => {
   var data = handler.check(req);
@@ -10,9 +9,11 @@ router.post('/', (req, res, next) => {
   } else {
     handler.getUserInfo(data, (userInfo) => {  
       if( userInfo !== 'error') {
+        var connection = handler.connection();
         connection.query('select * from court where creator=?',
         [userInfo.uid],(err, rows, fields) => {
           res.send(rows);
+          connection.end();
         });         
       } else {
         res.send('error');

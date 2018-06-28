@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('../handler')
-var connection = handler.connection();
 var cookie = require('cookie');
 
 router.post('/', (req, res, next) => {
@@ -15,6 +14,7 @@ router.post('/', (req, res, next) => {
   } else {
     handler.getUserInfo(data, (userInfo) => {  
       if(userInfo !== 'error') {
+        var connection = handler.connection();
         connection.query('UPDATE user set password=? where uid=?',
         [info.new_pass, userInfo.uid], (err, rows, fields) => {
           if(err) { res.send('error');} 
@@ -29,7 +29,8 @@ router.post('/', (req, res, next) => {
               path: '/api'
             }));            
             res.status(200).send('ok'); 
-          }                 
+          }
+          connection.end();                 
         });  
       } else {
         res.send('error');

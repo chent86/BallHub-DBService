@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('../handler')
-var connection = handler.connection();
 
 router.post('/', (req, res, next) => {
   var data = handler.check(req);
@@ -10,9 +9,17 @@ router.post('/', (req, res, next) => {
   } else {
     handler.getUserInfo(data, (userInfo) => {  
       if( userInfo !== 'error') {
-        connection.query('select * from (select gid,count(uid) from attend group by attend.gid)a,(select * from game)b where a.gid=b.gid',
-        (err, rows, fields) => {
-          res.send(rows);
+        var connection = handler.connection();
+        connection.query('select * from \
+        (select gid,count(uid) from attend group by attend.gid)a,\
+        (select * from game)b,\
+        (select cid,location from court)c,\
+        (select cid,gid from locate)d \
+        where a.gid=b.gid and b.gid=d.gid and d.cid=c.cid',
+        (err, rows, fields) => {  // a: 获得每个球局的参与人数   b:获得球局信息
+          if(err) { console.log(err);} // c:获得指定球局的球场id  d:获得球场信息
+          else { res.send(rows);}
+          connection.end();
         });         
       } else {
         res.send('error');
