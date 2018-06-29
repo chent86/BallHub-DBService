@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('../handler')
-var connection = handler.connection();
 
 router.post('/', (req, res, next) => {
   var data = handler.check(req);
@@ -10,6 +9,7 @@ router.post('/', (req, res, next) => {
   } else {
     handler.getUserInfo(data, (userInfo) => {  
       if( userInfo !== 'error') {
+        var connection = handler.connection();
         
       } else {
         res.send('error');

@@ -24,9 +24,29 @@ router.post('/', (req, res, next) => {
               else {
                 connection.query('INSERT into locate(gid,cid)values(LAST_INSERT_ID(),?)',
                 [info.cid], (err, rows, fields) => {
-                  if(err) {res.send('err');}
-                  else {res.send('ok');}
-                  connection.end();
+                  if(err) {res.send('error'); connection.end();}
+                  else {
+                    connection.query('SELECT LAST_INSERT_ID()',
+                    (err, rows, fields) => {
+                      var gid = rows[0]["LAST_INSERT_ID()"];
+                      var result = {};
+                      result[userInfo.uid] = {"score" : 0,"assist" : 0,"defend" : 0,"rebound": 0};
+                      connection.query('INSERT into result(data)values(?)',
+                      [JSON.stringify(result)], (err, rows, fields) => {
+                        if(err) {res.send('error'); connection.end();}
+                        else {
+                          connection.query('INSERT into record(gid,rid)values(?, LAST_INSERT_ID())',
+                          [gid], (err, rows, fields) => {
+                            if(err) {res.send('error'); connection.end();}
+                            else {
+                              res.send('ok');
+                              connection.end();
+                            }
+                          });                        
+                        }
+                      });
+                    });
+                  }
                 });
               }
             });            
