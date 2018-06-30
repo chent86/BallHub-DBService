@@ -165,7 +165,7 @@ function(err, rows, fields) {
                 });
       connection.query('create table result(rid int not null auto_increment,\
         primary key(rid),\
-        data char(200))CHARSET=utf8;',
+        data varchar(2000))CHARSET=utf8;',
                 function(err, rows, fields) {
                     if(err) {
                       console.log(err);
