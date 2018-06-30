@@ -26,9 +26,9 @@ npm start (8000端口)
 
 本地终端连接数据库
 ```
-mysql -uroot --protocol=TCP --port=3307 -p
-密码为： admin
-推荐使用可视化工具 MySQL Workbench查看数据(数据库端口为3307)
+mysql -uroot -p
+密码为： 16340030
+推荐使用可视化工具 MySQL Workbench查看数据(数据库端口为3306)
 ```
 
 重新生成数据库

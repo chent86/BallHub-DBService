@@ -5,9 +5,9 @@ var handler = {
     return mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'admin',
+      password: '16340030',
       database: 'BallHub',
-      port: 3307,
+      port: 3306,
       insecureAuth : true,
     });
   },
@@ -27,9 +27,9 @@ var handler = {
     var connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'admin',
+      password: '16340030',
       database: 'BallHub',
-      port: 3307,
+      port: 3306,
       insecureAuth : true,
     });
     connection.query('SELECT * FROM user where username=? and password=?',
