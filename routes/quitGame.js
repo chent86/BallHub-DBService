@@ -18,7 +18,7 @@ router.post('/', (req, res, next) => {
             if(rows[0].role == '组织者') {
               connection.query('DELETE from game where gid=?',
               [info.gid], (err, rows, fields) => {
-                if(err) { res.send('error'); }
+                if(err) { console.log(err); res.send('error'); }
                 else { res.send('ok'); }
                 connection.end();
               });                
