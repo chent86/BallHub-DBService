@@ -38,7 +38,7 @@ sudo docker rm db
 sudo docker rmi db-image
 sudo docker-compose up
 node init.js
-node db.js
+npm start
 ```
 
 ## 数据库表

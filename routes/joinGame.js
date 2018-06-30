@@ -8,6 +8,7 @@ router.post('/', (req, res, next) => {
     res.status(401).send('ERROR');
   } else {
     var info = req.body.gameInfo;
+    console.log(info);
     handler.getUserInfo(data, (userInfo) => {  
       if( userInfo !== 'error') {
         var connection = handler.connection();

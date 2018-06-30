@@ -15,7 +15,7 @@ router.post('/', (req, res, next) => {
         (select * from game)b,\
         (select cid,location from court)c,\
         (select cid,gid from locate)d \
-        where a.gid=b.gid and b.gid=d.gid and d.cid=c.cid', //and b.end_time > now()
+        where a.gid=b.gid and b.gid=d.gid and d.cid=c.cid and b.end_time > now()',
         (err, rows, fields) => {  // a: 获得每个球局的参与人数   b:获得球局信息
           if(err) { console.log(err);} // c:获得指定球局的球场id  d:获得球场信息
           else { res.send(rows);}  // 选择时判断球局是否已经结束
