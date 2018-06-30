@@ -15,9 +15,9 @@ function(err, rows, fields) {
     connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'admin',
+      password: '16340030',
       database: 'BallHub',
-      port: 3307,
+      port: 3306,
       insecureAuth : true,
     });
     //free_time_1: 星期的缩写 Mon Tue Wed Thu Fri Sat Sun
