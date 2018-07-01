@@ -11,7 +11,7 @@ router.post('/', (req, res, next) => {
       if( userInfo !== 'error') {
         var connection = handler.connection();
         connection.query('select * from \
-        (select * from game where end_time <= now() and valid = 1)a,\
+        (select * from game where end_time <= DATE_ADD(NOW(), INTERVAL 8 HOUR) and valid = 1)a,\
         (select gid from attend where uid=?)b \
         where a.gid = b.gid',  // 获得刚过时的所有比赛的gid
         [userInfo.uid],(err, rows, fields) => {

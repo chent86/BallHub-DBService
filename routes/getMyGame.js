@@ -16,7 +16,7 @@ router.post('/', (req, res, next) => {
         (select gid,role from attend where uid=?)c,\
         (select cid,location from court)d,\
         (select cid,gid from locate)e\
-        where a.gid=b.gid and b.gid=c.gid and c.gid=e.gid and d.cid=e.cid and b.end_time > now() and b.valid=1',
+        where a.gid=b.gid and b.gid=c.gid and c.gid=e.gid and d.cid=e.cid and b.end_time > DATE_ADD(NOW(), INTERVAL 8 HOUR) and b.valid=1',
         [userInfo.uid], (err, rows, fields) => {
           if(err) { console.log(err); res.send('error');}
           else {
