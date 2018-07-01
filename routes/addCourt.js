@@ -14,7 +14,7 @@ router.post('/', (req, res, next) => {
         connection.query('INSERT into court(creator, location, type, price, link)values(?,?,?,?,0)',
         [userInfo.uid, info.location, info.type, info.price],
         (err, rows, fields) => {
-          if(err) { console.log(err);res.send('error');} 
+          if(err) { console.log(err); res.send('error');} 
           else { res.send('ok'); }
           connection.end();
         });           

@@ -43,6 +43,7 @@ npm start
 
 ## 数据库表
 
+### 数据库结构图表:  database/DB.dia
 ### user
 |列名|类型|特性|
 |:-:|:-:|:-:|
@@ -88,9 +89,65 @@ npm start
 |end_time|CHAR|结束时间|
 |type|CHAR|半场或全场|
 |number|INT|最大人数|
+|valid|INT|球赛是否已经结束|
 
 ### attend
 |列名|类型|特性|
 |:-:|:-:|:-:|
-|uid|INT|foreign key(指向user)级联删除|
+|uid|INT|foreign key(指向user)级联删除，主码(uid,gid)|
 |gid|INT|foreign key(指向game)级联删除|
+|role|CHAR|作为球赛的参与者还是组织者|
+
+### court
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|cid|INT|primary key|
+|creator|INT|添加该球局的用户id|
+|type|CHAR|球场类型|
+|price|INT|球场费用|
+|link|INT|球场引用次数|
+
+### locate
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|gid|INT|foreign key(指向game)级联删除，主码(gid,cid)|
+|cid|INT|foreign key(指向court)级联删除|
+
+### mail
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|mid|INT|primary key|
+|gid|INT|foreign key(指向game,删除不级联),与该邮件关联的球局|
+|sender|INT|邮件发送人的用户名|
+|message|CHAR|邮件信息|
+|type|CHAR|邮件类型，rusult:系统提醒用户填写比赛结果,invitation:球赛邀请,apply:球赛申请,refuse:申请拒绝通知,permit:申请通过通知,pigeon:球赛球员退赛通知|
+
+### receive
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|uid|INT|foreign key(指向user)级联删除，主码(uid,mid)|
+|mid|INT|foreign key(指向mail)级联删除|
+
+### result
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|rid|INT|primary key|
+|data|VARCHAR|球赛中各个参与者的表现的json数据包|
+
+```
+{
+  uid: {
+    score: int,   // 得分
+    assist: int,  // 助攻
+    defend: int,  // 盖帽
+    rebound: int  // 篮板
+  }
+}
+```
+
+### record
+
+|列名|类型|特性|
+|:-:|:-:|:-:|
+|gid|INT|foreign key(指向game)级联删除，主码(gid,rid)|
+|rid|INT|foreign key(指向result)级联删除|

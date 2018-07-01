@@ -12,7 +12,7 @@ router.post('/', (req, res, next) => {
         var connection = handler.connection();
         connection.query('Delete FROM user where username=? and password=?',
         [userInfo.username, userInfo.password], (err, rows, fields) => {
-          if(err) {res.send('error');}
+          if(err) {console.log(err); res.send('error');}
           else { res.status(200).send('ok');}
           connection.end();
         });

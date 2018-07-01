@@ -14,6 +14,7 @@ router.post('/', (req, res, next) => {
         connection.query('UPDATE user set name=?,birthday=?,free_time_1=?,free_time_2=? where uid=?',
         [info.name, info.birthday, info.free_time_1, info.free_time_2, userInfo.uid], (err) => {
           if(err) {
+            console.log(err); 
             res.send('error');
             connection.end();
           } else {
@@ -24,12 +25,12 @@ router.post('/', (req, res, next) => {
               if(role == 'player') { // 因为每个表的数据段不同，需要判断并分别进行插入
                 connection.query('UPDATE player set sex=? where rid=?',
                 [info.sex, id], (err) => {
-                  if(err) {res.send('error'); } else {res.status(200).send('ok');}
+                  if(err) { console.log(err); res.send('error'); } else {res.status(200).send('ok');}
                   connection.end();                
                 });                    
               } else if(role == 'referee') {
                   connection.query('UPDATE referee set sex=?,price=? where rid=?',
-                  [info.sex, info.price, id], (err) => { if(err) { res.send('error');} 
+                  [info.sex, info.price, id], (err) => { if(err) { console.log(err); res.send('error');} 
                   else { res.status(200).send('ok');} 
                   connection.end();});  
               } else if(role == 'team') {

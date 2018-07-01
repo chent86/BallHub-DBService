@@ -11,7 +11,8 @@ router.post('/', (req, res, next) => {
     connection.query('INSERT into user (username, password) values (?,?)', //添加信息到user
     [data.username, data.password],(err, rows, fields) => {
       // 通过LAST_INSERT_ID()获得当前connection的最新的自增id(不会有出错的风险且没有上锁的必要)
-      if(err) { 
+      if(err) {
+        console.log(err); 
         res.send('error');
         connection.end();
       } else {
@@ -19,7 +20,7 @@ router.post('/', (req, res, next) => {
         [data.role],(err,rows,fields) => {
           connection.query('INSERT into ?? (rid) values (LAST_INSERT_ID())', //添加信息到具体表
           [data.role],(err,rows,fields) => {
-            if(err) {res.send('error');}
+            if(err) { console.log(err); res.send('error');}
             else {res.status(200).send('ok');}
             connection.end();
           });  

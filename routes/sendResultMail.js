@@ -16,7 +16,7 @@ router.post('/', (req, res, next) => {
         where a.gid = b.gid',  // 获得刚过时的所有比赛的gid
         [userInfo.uid],(err, rows, fields) => {
           var outDate = rows;
-          if(err) {res.send('error'); connection.end();}
+          if(err) { console.log(err); res.send('error'); connection.end();}
           else {
             if(outDate.length == 0) {
               res.send('ok');

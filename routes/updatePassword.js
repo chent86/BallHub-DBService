@@ -17,7 +17,7 @@ router.post('/', (req, res, next) => {
         var connection = handler.connection();
         connection.query('UPDATE user set password=? where uid=?',
         [info.new_pass, userInfo.uid], (err, rows, fields) => {
-          if(err) { res.send('error');} 
+          if(err) { console.log(err); res.send('error');} 
           else {
             var new_cookie = {
               "username": data.username,
