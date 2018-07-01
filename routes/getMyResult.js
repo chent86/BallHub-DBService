@@ -15,7 +15,7 @@ router.post('/', (req, res, next) => {
         (select * from record)b,\
         (select * from result)c,\
         (select * from game)d \
-        where a.uid = ? and a.gid=b.gid and b.rid=c.rid and d.gid=a.gid',
+        where a.uid = ? and a.gid=b.gid and b.rid=c.rid and d.gid=a.gid and d.valid=0',
         [userInfo.uid],(err, rows, fields) => {
           if(err) console.log(err);
           var compare = (x,y) => {

@@ -25,7 +25,7 @@ function(err, rows, fields) {
     connection.query('create table user(uid int not null auto_increment,\
       username char(20) not null,\
       password char(20) not null,\
-      name char(10),\
+      name char(50),\
       birthday char(10),\
       free_time_1 char(5),\
       free_time_2 char(10),\
@@ -72,7 +72,7 @@ function(err, rows, fields) {
                   }
               });
     connection.query('create table team(rid int not null,\
-      motto char(30),\
+      motto char(50),\
       primary key(rid),\
       foreign key(rid) references ISA(rid)\
       on delete cascade \
